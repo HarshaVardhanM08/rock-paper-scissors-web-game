@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        h1 {
+            font-size: clamp(24px, 5vw, 48px);
+            margin-bottom: 40px;
+            color: #00ffc3;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px #00ffc3;
+            }
+            to {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px #00ffc3, 0 0 30px #00ffc3;
+            }
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .player-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ffc3;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hand-box {
+            width: 140px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            font-size: 72px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .hand-box.animate {
+            animation: pop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-color: #00ffc3;
+            box-shadow: 0 0 30px rgba(0, 255, 195, 0.5);
+        }
+
+        @keyframes pop {
+            0% { 
+                transform: scale(1) rotate(0deg);
+            }
+            25% {
+                transform: scale(0.8) rotate(-5deg);
+            }
+            50% { 
+                transform: scale(1.2) rotate(5deg);
+            }
+            75% {
+                transform: scale(1.1) rotate(-2deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .vs-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .choice-button {
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .choice-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .choice-button:hover {
+            background: linear-gradient(145deg, #00ffc3, #00e6b0);
+            color: #000;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 255, 195, 0.4);
+        }
+
+        .choice-button:hover::before {
+            left: 100%;
+        }
+
+        .choice-button:active {
+            transform: translateY(-1px) scale(1.02);
+            transition: all 0.1s ease;
+        }
+
+        .choice-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #result {
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-win {
+            color: #00ff88;
+            animation: celebrate 0.8s ease-in-out;
+        }
+
+        .result-lose {
+            color: #ff4757;
+            animation: shake 0.6s ease-in-out;
+        }
+
+        .result-draw {
+            color: #ffa502;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-2deg); }
+            50% { transform: scale(1.2) rotate(2deg); }
+            75% { transform: scale(1.1) rotate(-1deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .score-board {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #cccccc;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffc3;
+        }
+
+        .countdown {
+            font-size: 48px;
+            color: #ffa502;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            animation: countdownPulse 1s ease-in-out;
+        }
+
+        @keyframes countdownPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-area {
+                gap: 30px;
+            }
+
+            .hand-box {
+                width: 120px;
+                height: 120px;
+                font-size: 60px;
+            }
+
+            .buttons {
+                gap: 15px;
+            }
+
+            .choice-button {
+                padding: 12px 20px;
+                font-size: 16px;
+                min-width: 100px;
+            }
+
+            .score-board {
+                gap: 20px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-area {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hand-box {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .choice-button {
+                width: 200px;
+            }
+
+            .vs-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 Rock Paper Scissors 🎮</h1>
+
+        <div class="game-area">
+            <div class="player-section">
+                <div class="player-label">You</div>
+                <div id="player" class="hand-box">❓</div>
+            </div>
+            
+            <div class="vs-text">VS</div>
+            
+            <div class="player-section">
+                <div class="player-label">Computer</div>
+                <div id="computer" class="hand-box">❓</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="choice-button" onclick="playGame('rock')" id="rock-btn">
+                ✊ Rock
+            </button>
+            <button class="choice-button" onclick="playGame('paper')" id="paper-btn">
+                ✋ Paper
+            </button>
+            <button class="choice-button" onclick="playGame('scissors')" id="scissors-btn">
+                ✌️ Scissors
+            </button>
+        </div>
+
+        <div class="result-container">
+            <div id="result"></div>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Wins</div>
+                <div class="score-value" id="player-score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Draws</div>
+                <div class="score-value" id="draw-score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Losses</div>
+                <div class="score-value" id="computer-score">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            playerScore: 0,
+            computerScore: 0,
+            drawScore: 0,
+            isPlaying: false
+        };
+
+        // Hand emojis mapping
+        const handEmojis = {
+            rock: '✊',
+            paper: '✋',
+            scissors: '✌️'
+        };
+
+        // Game choices
+        const choices = ['rock', 'paper', 'scissors'];
+
+        // DOM elements
+        const playerDiv = document.getElementById('player');
+        const computerDiv = document.getElementById('computer');
+        const resultDiv = document.getElementById('result');
+        const playerScoreDiv = document.getElementById('player-score');
+        const computerScoreDiv = document.getElementById('computer-score');
+        const drawScoreDiv = document.getElementById('draw-score');
+        const buttons = document.querySelectorAll('.choice-button');
+
+        // Disable/Enable buttons
+        function toggleButtons(disabled) {
+            buttons.forEach(button => {
+                button.disabled = disabled;
+            });
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            playerScoreDiv.textContent = gameState.playerScore;
+            computerScoreDiv.textContent = gameState.computerScore;
+            drawScoreDiv.textContent = gameState.drawScore;
+        }
+
+        // Determine winner
+        function determineWinner(playerChoice, computerChoice) {
+            if (playerChoice === computerChoice) {
+                return 'draw';
+            }
+
+            const winConditions = {
+                rock: 'scissors',
+                paper: 'rock',
+                scissors: 'paper'
+            };
+
+            return winConditions[playerChoice] === computerChoice ? 'win' : 'lose';
+        }
+
+        // Get result message and class
+        function getResultInfo(result) {
+            switch (result) {
+                case 'win':
+                    return { message: '🎉 You Win!', className: 'result-win' };
+                case 'lose':
+                    return { message: '😢 You Lose!', className: 'result-lose' };
+                case 'draw':
+                    return { message: '🤝 It\'s a Draw!', className: 'result-draw' };
+                default:
+                    return { message: '', className: '' };
+            }
+        }
+
+        // Play countdown animation
+        function playCountdown() {
+            return new Promise((resolve) => {
+                let count = 3;
+                const countdownInterval = setInterval(() => {
+                    if (count > 0) {
+                        playerDiv.innerHTML = `<span class="countdown">${count}</span>`;
+                        computerDiv.innerHTML = `<span class="countdown">${count}</span>`;
+                        count--;
+                    } else {
+                        playerDiv.innerHTML = '<span class="countdown">GO!</span>';
+                        computerDiv.innerHTML = '<span class="countdown">GO!</span>';
+                        clearInterval(countdownInterval);
+                        setTimeout(resolve, 500);
+                    }
+                }, 800);
+            });
+        }
+
+        // Main game function
+        async function playGame(playerChoice) {
+            // Prevent multiple clicks during game
+            if (gameState.isPlaying) return;
+            gameState.isPlaying = true;
+
+            // Disable buttons during game
+            toggleButtons(true);
+
+            // Clear previous result
+            resultDiv.textContent = '';
+            resultDiv.className = '';
+
+            // Generate computer choice
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+
+            // Play countdown
+            await playCountdown();
+
+            // Reset and animate hand boxes
+            playerDiv.classList.remove('animate');
+            computerDiv.classList.remove('animate');
+            playerDiv.textContent = '❓';
+            computerDiv.textContent = '❓';
+
+            // Force reflow to ensure classes are removed
+            void playerDiv.offsetWidth;
+            void computerDiv.offsetWidth;
+
+            // Add animation classes
+            playerDiv.classList.add('animate');
+            computerDiv.classList.add('animate');
+
+            // Show choices after animation delay
+            setTimeout(() => {
+                playerDiv.textContent = handEmojis[playerChoice];
+                computerDiv.textContent = handEmojis[computerChoice];
+
+                // Determine winner
+                const result = determineWinner(playerChoice, computerChoice);
+                const resultInfo = getResultInfo(result);
+
+                // Update score
+                switch (result) {
+                    case 'win':
+                        gameState.playerScore++;
+                        break;
+                    case 'lose':
+                        gameState.computerScore++;
+                        break;
+                    case 'draw':
+                        gameState.drawScore++;
+                        break;
+                }
+
+                // Display result with animation
+                setTimeout(() => {
+                    resultDiv.textContent = resultInfo.message;
+                    resultDiv.className = resultInfo.className;
+                    updateScoreDisplay();
+
+                    // Re-enable buttons
+                    toggleButtons(false);
+                    gameState.isPlaying = false;
+                }, 300);
+
+            }, 600);
+        }
+
+        // Add keyboard support
+        document.addEventListener('keydown', (event) => {
+            if (gameState.isPlaying) return;
+
+            switch (event.key.toLowerCase()) {
+                case 'r':
+                    playGame('rock');
+                    break;
+                case 'p':
+                    playGame('paper');
+                    break;
+                case 's':
+                    playGame('scissors');
+                    break;
+            }
+        });
+
+        // Add button highlight effects
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                if (!button.disabled) {
+                    button.style.transform = 'translateY(-3px) scale(1.05)';
+                }
+            });
+
+            button.addEventListener('mouseleave', () => {
+                if (!button.disabled) {
+                    button.style.transform = '';
+                }
+            });
+        });
+
+        // Initialize score display
+        updateScoreDisplay();
+
+        // Add some initial instructions
+        setTimeout(() => {
+            if (gameState.playerScore === 0 && gameState.computerScore === 0 && gameState.drawScore === 0) {
+                resultDiv.innerHTML = 'Choose your weapon! 🎯<br><small style="font-size: 14px; opacity: 0.8;">Keyboard shortcuts: R (Rock), P (Paper), S (Scissors)</small>';
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
