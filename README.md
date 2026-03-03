@@ -213,7 +213,7 @@ This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-**Harsha Vardhan**
+**Harsha Vardhan Maradana**
 
 🔗 GitHub:  
 https://github.com/HarshaVardhanM08  
